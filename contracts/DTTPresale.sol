@@ -41,15 +41,6 @@ contract DTTPresale {
         BNB20Token.transferFrom(msg.sender, address(this), amount);
     }
 
-    function withdrawDepostedDTT(uint256 amount) public onlyOwner(msg.sender) {
-        require(
-            amount.mul(10**BNB20Token.decimals()) <=
-                BNB20Token.balanceOf(address(this)),
-            "Amount is exceeded"
-        );
-        BNB20Token.transfer(msg.sender, amount);
-    }
-
     function updatePresaleEndStatus(bool _status) public onlyOwner(msg.sender) {
         isPresaleEnded = _status;
         presaleEndTime = block.timestamp;
@@ -81,7 +72,7 @@ contract DTTPresale {
     }
 
     function withdrawDttToken(uint256 amount) public {
-        // require(block.timestamp > presaleEndTime, "Presale is in progress");
+        require(block.timestamp > presaleEndTime, "Presale is in progress");
         require(
             tokenBalance[msg.sender] > 0,
             "You already withdraw all of your BNB20Token"
@@ -95,17 +86,14 @@ contract DTTPresale {
         BNB20TokenPrice = _setPrice;
     }
 
-    function buyDttToken(uint256 tokenCount) public payable {
+    function buyDttToken() public payable {
         require(!isPresaleEnded, "Presale is ended");
-        require(block.timestamp <= presaleEndTime, "Presale ended");
-        require(
-            msg.value >= BNB20TokenPrice.mul(tokenCount),
-            "Insufficient amount."
-        );
+        require(block.timestamp <= presaleEndTime, "Presale is ended");
+        uint256 tokenCount = msg.value.div(BNB20TokenPrice);
         require(
             totalSoldTokens + tokenCount.mul(10**BNB20Token.decimals()) <=
                 BNB20Token.balanceOf(address(this)),
-            "Insufficient token amount."
+            "Not enough tokens remaining in presale."
         );
 
         if (tokenBalance[msg.sender] == 0) {
@@ -126,7 +114,7 @@ contract DTTPresale {
 
     function withdrawETH() public onlyOwner(msg.sender) {
         //onlyOwner
-        require(fundIndex > 1, "Fund Wallet should be set");
+        require(fundIndex >= 1, "Fund Wallet should be set");
         uint256 total_balance = address(this).balance;
         for (uint256 i = 0; i < fundIndex; i++) {
             FundWallet memory fundWallet = fundList[i];
@@ -134,7 +122,6 @@ contract DTTPresale {
                 total_balance.mul(fundWallet.percent).div(100)
             );
         }
-        // payable(msg.sender).transfer(address(this).balance);
     }
 
     function setPresalePeriod(uint256 _presalePeriod)
