@@ -47,7 +47,7 @@ describe("Check deployment", async () => {
     let buy_count = 5;
     // price is 0.01 ether
     console.log("---------- Trying to buy " + buy_count + " tokens");
-    await dttPresale.buyDttToken(buy_count, {
+    await dttPresale.buyDttToken({
       value: BigNumber.from(10).pow(16).mul(buy_count),
     });
 
@@ -92,12 +92,12 @@ describe("Check deployment", async () => {
     // Set Token Price
     console.log(
       "---------- Token Price = ",
-      await dttPresale.BNB20TokenPrice()
+      await dttPresale.TokenCountPerEth()
     );
-    await dttPresale.setPrice(BigNumber.from(10).pow(16).mul(2)); // 0.02 ether
+    await dttPresale.setTokenCountPerEth(BigNumber.from(10).pow(16).mul(200)); // 100x per 1 ether
     console.log(
       "---------- Token Price after changing = ",
-      await dttPresale.BNB20TokenPrice()
+      await dttPresale.TokenCountPerEth()
     );
 
     // Set Fund List

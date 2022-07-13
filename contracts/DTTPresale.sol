@@ -5,7 +5,7 @@ contract DTTPresale {
     using SafeMath for uint256;
     IBEP20 public BNB20Token;
     address public owner;
-    uint256 public BNB20TokenPrice = 0.01 ether;
+    uint256 public TokenCountPerEth = 100000000000000000000;
     uint256 public totalSoldTokens;
     uint256 public totalParticipants;
     uint256 public presalePeriod = 90 days;
@@ -72,7 +72,7 @@ contract DTTPresale {
     }
 
     function withdrawDttToken(uint256 amount) public {
-        require(block.timestamp > presaleEndTime, "Presale is in progress");
+        // require(block.timestamp > presaleEndTime, "Presale is in progress");
         require(
             tokenBalance[msg.sender] > 0,
             "You already withdraw all of your BNB20Token"
@@ -82,17 +82,16 @@ contract DTTPresale {
         tokenBalance[msg.sender] -= amount;
     }
 
-    function setPrice(uint256 _setPrice) public onlyOwner(msg.sender) {
-        BNB20TokenPrice = _setPrice;
+    function setTokenCountPerEth(uint256 _count) public onlyOwner(msg.sender) {
+        TokenCountPerEth = _count;
     }
 
     function buyDttToken() public payable {
         require(!isPresaleEnded, "Presale is ended");
         require(block.timestamp <= presaleEndTime, "Presale is ended");
-        uint256 tokenCount = msg.value.div(BNB20TokenPrice);
+        uint256 tokenCount = msg.value.mul(TokenCountPerEth).div(10**18);
         require(
-            totalSoldTokens + tokenCount.mul(10**BNB20Token.decimals()) <=
-                BNB20Token.balanceOf(address(this)),
+            totalSoldTokens + tokenCount <= BNB20Token.balanceOf(address(this)),
             "Not enough tokens remaining in presale."
         );
 
@@ -100,8 +99,8 @@ contract DTTPresale {
             totalParticipants++;
         }
 
-        tokenBalance[msg.sender] += tokenCount.mul(10**BNB20Token.decimals());
-        totalSoldTokens += tokenCount.mul(10**BNB20Token.decimals());
+        tokenBalance[msg.sender] += tokenCount;
+        totalSoldTokens += tokenCount;
     }
 
     function availableTokenForPresale() public view returns (uint256) {

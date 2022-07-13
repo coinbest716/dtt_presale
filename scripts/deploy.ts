@@ -13,7 +13,7 @@ async function main(): Promise<void> {
   let admin: SignerWithAddress;
   let dtt: DTT;
   let dttPresale: DTTPresale;
-  let total_count = 10000;
+  let total_count = 1000;
 
   [admin] = await ethers.getSigners();
   dtt = await new DTT__factory(admin).deploy("DTT Token", "DTT", admin.address);
@@ -48,7 +48,7 @@ async function main(): Promise<void> {
   let buy_count = 1;
   // price is 0.01 ether
   console.log("---------- Trying to buy " + buy_count + " tokens");
-  let buyDttToken = await dttPresale.buyDttToken(buy_count, {
+  let buyDttToken = await dttPresale.buyDttToken({
     value: BigNumber.from(10).pow(16).mul(buy_count),
   });
   await buyDttToken.wait();
@@ -90,11 +90,11 @@ async function main(): Promise<void> {
   );
 
   // Set Token Price
-  console.log("---------- Token Price = ", await dttPresale.BNB20TokenPrice());
-  await dttPresale.setPrice(BigNumber.from(10).pow(16).mul(2)); // 0.02 ether
+  console.log("---------- Token Price = ", await dttPresale.TokenCountPerEth());
+  await dttPresale.setTokenCountPerEth(BigNumber.from(10).pow(18).mul(100)); // 100x per 1 ether
   console.log(
     "---------- Token Price after changing = ",
-    await dttPresale.BNB20TokenPrice()
+    await dttPresale.TokenCountPerEth()
   );
 
   // Set Fund List
