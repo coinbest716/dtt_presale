@@ -78,7 +78,7 @@ async function main(): Promise<void> {
     await dttPresale.availableTokenForPresale()
   );
 
-  // Set Presale duration
+  //Set Presale duration
   console.log(
     "---------- Presale Duration = ",
     await dttPresale.presalePeriod()

@@ -5,7 +5,8 @@ contract DTTPresale {
     using SafeMath for uint256;
     IBEP20 public BNB20Token;
     address public owner;
-    uint256 public TokenCountPerEth = 100000000000000000000;
+    uint256 public TokenCountPerEth = 100000000000000000000; // include the 0's for the token decimals
+    uint256 public uncliamedSoldTokens;
     uint256 public totalSoldTokens;
     uint256 public totalParticipants;
     uint256 public presalePeriod = 90 days;
@@ -80,6 +81,7 @@ contract DTTPresale {
         BNB20Token.transfer(msg.sender, amount);
         withdrawBalance[msg.sender] += amount;
         tokenBalance[msg.sender] -= amount;
+        uncliamedSoldTokens -= amount;
     }
 
     function setTokenCountPerEth(uint256 _count) public onlyOwner(msg.sender) {
@@ -88,10 +90,11 @@ contract DTTPresale {
 
     function buyDttToken() public payable {
         require(!isPresaleEnded, "Presale is ended");
-        require(block.timestamp <= presaleEndTime, "Presale is ended");
+        require(block.timestamp <= presaleEndTime, "Presale period is ended");
         uint256 tokenCount = msg.value.mul(TokenCountPerEth).div(10**18);
         require(
-            totalSoldTokens + tokenCount <= BNB20Token.balanceOf(address(this)),
+            uncliamedSoldTokens + tokenCount <=
+                BNB20Token.balanceOf(address(this)),
             "Not enough tokens remaining in presale."
         );
 
@@ -100,6 +103,7 @@ contract DTTPresale {
         }
 
         tokenBalance[msg.sender] += tokenCount;
+        uncliamedSoldTokens += tokenCount;
         totalSoldTokens += tokenCount;
     }
 
@@ -109,6 +113,10 @@ contract DTTPresale {
 
     function balanceOf() public view returns (uint256) {
         return address(this).balance;
+    }
+
+    function getTokenDecimals() public view returns (uint256) {
+        return BNB20Token.decimals();
     }
 
     function withdrawETH() public onlyOwner(msg.sender) {
@@ -128,7 +136,7 @@ contract DTTPresale {
         onlyOwner(msg.sender)
     {
         presalePeriod = _presalePeriod.mul(1 days);
-        presaleEndTime = presaleStartTime.add(_presalePeriod);
+        presaleEndTime = presaleStartTime.add(presalePeriod);
     }
 }
 
