@@ -13,7 +13,7 @@ async function main(): Promise<void> {
   let admin: SignerWithAddress;
   let dtt: DTT;
   let dttPresale: DTTPresale;
-  let total_count = 1000;
+  let total_count = 10000;
 
   [admin] = await ethers.getSigners();
   dtt = await new DTT__factory(admin).deploy("DTT Token", "DTT", admin.address);
@@ -29,7 +29,7 @@ async function main(): Promise<void> {
   await mint.wait();
   console.log("---------- totalSupply = " + (await dtt.totalSupply()));
 
-  let deposit_count = 10;
+  let deposit_count = 10000;
   let dtt_approve = await dtt.approve(
     dttPresale.address,
     BigNumber.from(10).pow(18).mul(deposit_count)

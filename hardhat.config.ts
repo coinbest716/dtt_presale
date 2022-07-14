@@ -47,6 +47,11 @@ const config: HardhatUserConfig = {
       url: "https://goerli.infura.io/v3/" + INFURA_TOKEN,
       accounts: [process.env.PRIVATE_KEY!],
     },
+    bsc: {
+      chainId: 97,
+      url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+      accounts: [process.env.PRIVATE_KEY!],
+    },
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
       accounts: [process.env.PRIVATE_KEY!, process.env.PRIVATE_KEY1!],

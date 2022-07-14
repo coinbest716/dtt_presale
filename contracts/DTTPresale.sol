@@ -76,7 +76,11 @@ contract DTTPresale {
         // require(block.timestamp > presaleEndTime, "Presale is in progress");
         require(
             tokenBalance[msg.sender] > 0,
-            "You already withdraw all of your BNB20Token"
+            "No tokens are within your presale balance."
+        );
+        require(
+            tokenBalance[msg.sender] >= amount,
+            "You are attempting to claim more tokens than are within your presale balance."
         );
         BNB20Token.transfer(msg.sender, amount);
         withdrawBalance[msg.sender] += amount;
